@@ -3,9 +3,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 var game = require(__dirname +'/memory.js');
-game.makeDeck();
-
-console.log('Deck created');
 
 var players = {};
 var start = false;
@@ -38,11 +35,28 @@ io.on('connection', function(socket){
 
 		}
 
+		if(Object.size(players) >= 2){
+
+			game.Game();
+
+			console.log('deck created');
+
+			io.emit('showCards');
+		}
+
 	});
 
-	socket.on('disconnect',function(){
+	socket.on('disconnect',function(client){
 
 		console.log('player ' + socket.id + ' left');
+
+		delete players[client.id];
+
+		for(var key in players) {
+
+			console.log('remaining players: ' + key + ': ' + players[key]);
+
+		}
 
 	});
 
@@ -52,9 +66,6 @@ io.on('connection', function(socket){
 http.listen(3000, function(){
 	console.log('De serverluisteraar op poort 3000');
 });
-
-
-
 
 
 Object.size = function(obj) {  

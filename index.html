@@ -1,0 +1,256 @@
+<!doctype html>
+<html>
+  <head>
+	<title>NodeJS Memory Multiplayer</title>
+
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <style>
+		#chat{
+
+			width:300px;
+			height:100%;
+
+			border:1px solid #eee;
+
+			position:fixed;
+			top:0;
+			right:0;
+			bottom:0;
+
+		}
+
+		#chat-form{
+
+			width:100%;
+
+			bottom:0;
+			position: absolute;
+		}
+
+		#menu{
+			position: fixed;
+			left:0;
+			top:0;
+			bottom:0;
+
+			width:60px;
+			height:100%;
+
+			background-color:#3366AB;
+		}
+			#menu ul{
+				list-style: none;
+				margin:0;
+				padding:0;
+
+				margin:20px 0 0 10px;
+			}
+			#menu li a{
+				color:#fff;
+				display: block; 
+				text-align: center;
+
+				width:40px;
+				height:40px;
+				line-height: 40px;
+
+				background:#3973bf;
+			}
+			#menu li a:hover{
+				background:#2c5891;
+			}
+
+		#content{
+			position:fixed;
+			left:100px;
+			top:0;
+			bottom:0;
+			right:300px;
+			padding-left:50px;
+		}
+		#chat--window{
+
+			margin:0;
+			padding:0;
+			list-style: none;
+
+		}
+			#chat--window li{
+				padding: 5px 3px;
+			}
+			#chat--window li:nth-child(even){
+				background-color:#eee;
+
+			}
+
+		.card{
+		    float:left;
+		    
+		    width:200px;
+		    height:200px;
+		    
+		    position:relative;    
+		    
+		    margin-right: 20px;
+		    
+		    -webkit-perspective: 600px;
+		    -moz-perspective: 600px;
+		    perspective: 600px;
+		}
+
+		.card--front, .card--back{
+		    float:none;
+		    position:absolute;
+		    top:0;
+		    left:0;
+		    
+		    text-align:center;
+		    color:white;
+		    
+		    width: inherit;
+		    height:inherit;
+		   
+		}
+		.card--front{
+		    background:#444;
+		    
+		    z-index:900;
+		    
+		    -webkit-transform: rotateX(0deg) rotateY(0deg);
+		    -moz-transform: rotateX(0deg) rotateY(0deg);
+		    transform: rotateX(0deg) rotateY(0deg);
+
+		    -webkit-transform-style: preserve-3d;
+		    -moz-transform-style: preserve-3d;
+		    transform-style: preserve-3d;
+
+		    -webkit-backface-visibility: hidden;
+		    -moz-backface-visibility: hidden;
+		    backface-visibility: hidden;
+
+		    
+		    -webkit-transition: all .4s ease-in-out;
+		    transition: all .4s ease-in-out;
+
+		}
+
+		.card.flip .card--front{
+		    
+		    z-index:900;
+		    
+		    -webkit-transform: rotateY(180deg);
+		    -moz-transform: rotateY(180deg);
+		    transform: rotateY(180deg);
+		    
+		}
+		.card--back{
+		    background: red;
+		    
+		    z-index:800;
+		    
+		    -webkit-transform: rotateY(-180deg);
+		    -moz-transform: rotateY(-179deg); 
+		    transform: rotateY(-179deg);
+		    
+		    -webkit-transform-style: preserve-3d;
+		    -moz-transform-style: preserve-3d;
+		    transform-style: preserve-3d;
+		    
+		    -webkit-backface-visibility: hidden;
+		    -moz-backface-visibility: hidden;
+		    backface-visibility: hidden;
+		    
+		    -webkit-transition: all .4s ease-in-out;
+		    transition: all .4s ease-in-out;
+
+		}
+
+		.card.flip .card--back{
+		    
+		    z-index:1000;
+		    
+		    -webkit-transform: rotateX(0deg) rotateY(0deg);
+		    -moz-transform: rotateX(0deg) rotateY(0deg);
+		    transform: rotateX(0deg) rotateY(0deg);
+
+		}
+    </style>
+
+</head>
+<body>
+
+	<div id="menu">
+		<ul>
+			<li><a href="#" class="start" title="" data-toggle="tooltip" title="Start new game"><i class="fa fa-caret-right fa-lg"></i></a></li>
+		</ul>
+	</div>
+	<div id="content">
+		<h1>Welcome to... Memory Multiplayer Online</h1>
+
+		<input type="button" id="ready" value="I'm ready">
+
+		<div id="game">
+			
+		</div>
+	</div>
+	<div id="chat">
+		<ul id="chat--window">
+		</ul>
+		<form action="" name="chat" class="form-inline" role="form" id="chat-form">
+			<div class="form-group">
+				<label class="sr-only" for="message">Message</label>
+				<input type="text" class="form-control" id="message" placeholder="Message" autocomplete="off">
+			</div>
+			<button type="submit" class="btn btn-default">Send</button>
+		</form>
+	</div>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+
+		var socket = io();
+
+		$('form').submit(function(e){
+
+			socket.emit('chat message', $('#message').val());
+			$('#message').val('');
+			return false;
+
+		});
+
+		socket.on('chat message', function(msg){
+			$('#chat--window').append($('<li>').text(msg));
+		});
+
+
+		$(document).ready(function(){
+
+
+		    $('.click').on('click',function(){
+
+		    	if($(this).hasClass('flip')){
+		    		
+		    		$(this).removeClass('flip');
+
+		    	}else{
+
+		    		$(this).addClass('flip');
+
+		    	}
+		    });
+
+		    makeDeck();
+
+		});
+
+	</script>
+</body>
+</html>

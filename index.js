@@ -1,15 +1,23 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
+
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var game = require(__dirname +'/memory.js');
+var Game = require('./game.js');
+var Room = require('./room.js');
+var Player = require('./player.js');
+var Table = require('./table.js');
 
-var players = {};
-var start = false;
+
+app.use('/', express.static(__dirname + "/"));
 
 app.get('/', function(req,res){
-	res.sendFile(__dirname +'/index.html');
+	res.sendFile('./index.html');
 });
+
+var room = new Room('test');
+console.log(room);
 
 io.on('connection', function(socket){
 
@@ -36,10 +44,6 @@ io.on('connection', function(socket){
 		}
 
 		if(Object.size(players) >= 2){
-
-			game.Game();
-
-			console.log('deck created');
 
 			io.emit('showCards');
 		}

@@ -9,6 +9,7 @@ var Room = require('./room.js');
 var Player = require('./player.js');
 var Table = require('./table.js');
 
+var players = [];
 
 app.use('/', express.static(__dirname + "/"));
 
@@ -17,11 +18,60 @@ app.get('/', function(req,res){
 });
 
 var room = new Room('test');
-console.log(room);
+var table = new Table(1);
+var game = new Game();
+var player = new Player('test-new-id');
+
+table.setName('test room');
+room.tables = table;
+table.gameObj = game;
+table.pack = game.pack;
+
+
+//console.log(room);
 
 io.on('connection', function(socket){
 
-	console.log('new user with id: ' + socket.id);
+
+	/*
+
+		Speler voert naam in en klikt op Ready
+
+	*/
+
+	socket.on('connectToServer', function(data){
+
+		// welke user komt er binnen en met welk id
+		console.log('new user with id: ' + socket.id);
+
+		// nieuw Player object maken met het id van de socket
+		var player = new Player(socket.id);
+
+		// zet de naam afhankelijk van het veld 'name'
+		var name = data;
+
+		player.setName(name);
+
+		// zet de status naar 'intable'
+		player.setStatus('intable');
+
+		// voeg de speler toe aan een 'room'
+		room.addPlayer(player);
+
+		// stuur een bericht dat er een nieuwe user bij is gekomen.
+		io.sockets.emit('logging',{message: name + ' has connected'});
+
+		console.log(room);
+
+	});
+
+
+	socket.on('connectToTable', function(data){
+
+		
+
+	});
+	
 
 	socket.on('chat message', function(msg){
 
@@ -29,36 +79,15 @@ io.on('connection', function(socket){
 
 	});
 
-	socket.on('addPlayer', function(player){
-
-		players[socket.id] = player;
-
-		console.log('player ' + player + ' with id ' + socket.id + ' has joined');
-
-		console.log(Object.size(players));
-
-		for(var key in players) {
-
-			console.log('players: ' + key + ': ' + players[key]);
-
-		}
-
-		if(Object.size(players) >= 2){
-
-			io.emit('showCards');
-		}
-
-	});
-
 	socket.on('disconnect',function(client){
 
-		console.log('player ' + socket.id + ' left');
+		// huidige player opzoeken op socket id
+		var player = room.getPlayer(socket.id);
 
-		delete players[client.id];
+		// speler bestaat en zit aan tafel
+		if(player && player.status === 'intable'){
 
-		for(var key in players) {
-
-			console.log('remaining players: ' + key + ': ' + players[key]);
+			var table = room.getTable(player.tableID);
 
 		}
 
@@ -79,3 +108,5 @@ Object.size = function(obj) {
     }
     return size;
 };
+
+

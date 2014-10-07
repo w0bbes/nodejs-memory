@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-	<title>NodeJS Memory Multiplayer</title>
+	<title>NodeJS</title>
 
 	<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,6 +10,8 @@
 
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+
 
     <style>
 		#chat{
@@ -69,12 +71,26 @@
 
 		#content{
 			position:fixed;
-			left:100px;
+			left:60px;
 			top:0;
 			bottom:0;
 			right:300px;
 			padding-left:50px;
 		}
+
+		#bottom{
+			position: absolute;
+			bottom: 0;
+			left:0;
+			right:0;
+			height:200px;
+			background:#eee;
+		}
+			#updates{
+				list-style: none;
+				padding-top:20px;
+			}
+
 		#chat--window{
 
 			margin:0;
@@ -192,13 +208,18 @@
 		</ul>
 	</div>
 	<div id="content">
-		<h1>Welcome to... Memory Multiplayer Online</h1>
+		<h1>Welcome</h1>
 		<div id="splash">
 			<label for="name">Name: </label><input type="text" name="name" value="player1" id="name">
-			<input type="button" id="ready" value="I'm ready">
+			<input type="button" id="ready" value="Join table">
 		</div>
 		<div id="game">
 			
+		</div>
+		<div id="bottom">
+			<ul id="updates">
+
+			</ul>
 		</div>
 	</div>
 	<div id="chat">
@@ -215,6 +236,7 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
+
 	<script>
 
 		var socket = io();
@@ -233,6 +255,10 @@
 
 		socket.on('showCards',function(){
 			console.log('dealing cards');
+		});
+
+		socket.on('logging', function(data){
+			$('#updates').append('<li>' + data.message + '</li>');
 		});
 
 
@@ -254,22 +280,20 @@
 
 		    $('#ready').on('click',function(){
 
+		    	// naam gebruiker
 		    	var name = $('#name').val();
 
 		    	$(this).attr('disabled','disabled');
 
-		    	socket.emit('addPlayer', name);
+		    	// connectie met de server
+		    	socket.emit('connectToServer', name);
 
-		    	clearSplash();
+		    	// nieuwe tafel
+		    	socket.emit('connectToTable', {tableID: 1});
+
+		    	$('#content').append('<div class="loading">Waiting for other players..</div>');
 
 		    });
-
-		    function clearSplash(){
-		    	$('#content').append('<div class="loading">Waiting for other players..</div>');
-		    	$('#splash').fadeOut();
-		    }
-
-		    //makeDeck();
 
 		});
 

@@ -14,8 +14,10 @@ Game.prototype.makeDeck = function(){
 
 	finalDeck = this.shuffleColors( deck1.concat(deck2) );
 
+	return finalDeck;
+
 	//console.log( Object.keys(finalDeck) );
-	console.log(finalDeck);
+	//console.log(finalDeck);
 
 	//for(var i = 0; i <= aantal/2; i++){
 
@@ -43,4 +45,4 @@ Game.prototype.shuffleColors = function(color){
 	return color;
 }
 
-exports.Game = Game;
+module.exports = Game;

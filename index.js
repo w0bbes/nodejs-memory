@@ -68,7 +68,7 @@ io.on('connection', function(socket){
 
 	socket.on('connectToTable', function(data){
 
-		
+		// DIT MOET EERST GODVERDOMME
 
 	});
 	
@@ -79,7 +79,7 @@ io.on('connection', function(socket){
 
 	});
 
-	socket.on('disconnect',function(client){
+	socket.on('disconnect', function(client){
 
 		// huidige player opzoeken op socket id
 		var player = room.getPlayer(socket.id);
@@ -88,6 +88,12 @@ io.on('connection', function(socket){
 		if(player && player.status === 'intable'){
 
 			var table = room.getTable(player.tableID);
+
+			table.removePlayer(player);
+			table.status = 'available';
+			player.status = 'available';
+
+			io.sockets.emit('logging', player.name + 'has left the building');
 
 		}
 

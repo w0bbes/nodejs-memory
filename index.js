@@ -28,15 +28,10 @@ table.gameObj = game;
 table.pack = game.pack;
 
 
-//console.log(room);
-
 io.on('connection', function(socket){
 
-
 	/*
-
 		Speler voert naam in en klikt op Ready
-
 	*/
 
 	socket.on('connectToServer', function(data){
@@ -68,7 +63,16 @@ io.on('connection', function(socket){
 
 	socket.on('connectToTable', function(data){
 
-		// DIT MOET EERST GODVERDOMME
+		// dit returned juiste object
+		var player = room.getPlayer(socket.id);		
+
+		// zou een object moeten returnen
+		var table = room.getTable(data.tableID);
+
+
+		if( table.addPlayer(player) && table.isTableAvailable() ){
+			console.log('jaaaaaa toevoegen!');
+		}
 
 	});
 	

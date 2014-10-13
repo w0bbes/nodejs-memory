@@ -18,25 +18,6 @@ Room.prototype.addTable = function(table){
 
 }
 
-// return is een object, object Tables
-// hier zit een fout in, length op de tables object?
-Room.prototype.getTable = function(tableId){
-
-	var table = null;
-
-	console.log('this.tables' + this.tables.length + ' /this');
-
-	for(var i = 0; i < this.tables.length; i++){
-
-		if(this.tables[i].id == tableId){
-
-			table = this.tables[i];
-			break;
-
-		}
-	}
-	return table;
-}
 
 Room.prototype.getPlayer = function(playerId){
 
@@ -53,6 +34,26 @@ Room.prototype.getPlayer = function(playerId){
 	return player;
 
 }
+
+
+// return is een object, object Tables
+// hier zit een fout in, length op de tables object?
+Room.prototype.getTable = function(tableId){
+
+	var table = null;
+
+	for(var i = 0; i < this.tables.length; i++){
+
+		if(this.tables[i].id == tableId){
+
+			table = this.tables[i];
+			break;
+
+		}
+	}
+	return table;
+}
+
 
 
 

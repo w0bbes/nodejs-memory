@@ -1,21 +1,36 @@
-var express = require('express');
-var app = express();
-
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var socket = require('socket.io');
 
 var Game = require('./game.js');
 var Room = require('./room.js');
 var Player = require('./player.js');
 var Table = require('./table.js');
+var Messaging = require('./messaging.js');
 
-var players = [];
+//var players = [];
 
-app.use('/', express.static(__dirname + "/"));
+//setup an Express server to serve the content
+var http = require("http");
+var express = require("express");
+var app = express();
 
-app.get('/', function(req,res){
-	res.sendFile('./index.html');
+app.use("/", express.static(__dirname + "/"));
+app.use("/resources", express.static(__dirname + "/resources"));
+
+var server = http.createServer(app);
+server.listen(3000);
+var io = socket.listen(server);
+
+app.get('/', function (req, res) {
+  res.sendfile(__dirname + '/index.html');
 });
+
+io.set("log level", 1);
+
+var messaging = new Messaging();
+var room = new Room('test');
+room.tables = messaging.createSampleTables(1);
+
+/*
 
 var room = new Room('test');
 var table = new Table(1);
@@ -27,8 +42,10 @@ room.tables = table;
 table.gameObj = game;
 table.pack = game.pack;
 
+*/
 
-io.on('connection', function(socket){
+
+io.sockets.on('connection', function(socket){
 
 	/*
 		Speler voert naam in en klikt op Ready
@@ -52,7 +69,6 @@ io.on('connection', function(socket){
 
 		// voeg de speler toe aan een 'room'
 		room.addPlayer(player);
-
 		// stuur een bericht dat er een nieuwe user bij is gekomen.
 		io.sockets.emit('logging',{message: name + ' has connected'});
 
@@ -64,14 +80,84 @@ io.on('connection', function(socket){
 	socket.on('connectToTable', function(data){
 
 		// dit returned juiste object
-		var player = room.getPlayer(socket.id);		
+		var player = room.getPlayer(socket.id);	
 
 		// zou een object moeten returnen
 		var table = room.getTable(data.tableID);
 
+		console.log('table' + table.id + '');
 
 		if( table.addPlayer(player) && table.isTableAvailable() ){
-			console.log('jaaaaaa toevoegen!');
+
+			player.tableID = table.id;
+			player.status = 'intable';
+
+			table.playersID.push(socket.id);
+
+			io.sockets.emit('logging', {message: player.name + 'has connected to table ' + table.name + '.'});
+
+			if(table.players.length < 2){
+				io.sockets.emit('logging',{message: 'There is ' + table.players.length + ' player at this table. There are '+ table.playerLimit + ' needed to start'});
+				io.sockets.emit('logging',{message: 'Waiting for other players'});
+			}else{
+				io.sockets.emit('logging',{message: 'Enough players, starting'});
+
+				var countdown = 1; //3 seconds in reality...
+		        setInterval(function() {
+		          countdown--;
+		          io.sockets.emit('timer', { countdown: countdown });
+		        }, 1000);
+
+			}
+
+		}else{
+			console.log('niks');
+		}
+
+	});
+
+	socket.on('readyToPlay', function(data){
+
+		console.log('Ready to play!');
+
+		var player = room.getPlayer(socket.id);
+		var table = room.getTable(data.table);
+		player.status = 'playing';
+
+		table.readyToPlayCounter++;
+
+		var randomNumber = Math.floor(Math.random() * table.playerLimit); 
+
+		if(table.readyToPlayCounter === table.playerLimit){
+
+			table.status = 'unavailable';
+
+			io.sockets.emit('game', {deck: table.pack});
+
+			for(var i = 0; i < table.players.length; i++){
+
+				var startingPlayerId = table.playersID[randomNumber];
+
+				if(table.players[i].id === startingPlayerId){
+
+					table.players[i].turnFinished = false;
+
+					console.log(table.players[i].name + ' will start.');
+
+					io.to(table.players[i].id).emit('turn',{myturn: true});
+
+				}else{
+
+					console.log(table.players[i].name + ' will not start.');
+
+					table.players[i].turnFinished = true;
+
+					io.to(table.players[i].id).emit('turn',{myturn: false});
+
+				}
+
+			}
+
 		}
 
 	});
@@ -103,11 +189,6 @@ io.on('connection', function(socket){
 
 	});
 
-});
-
-
-http.listen(3000, function(){
-	console.log('De serverluisteraar op poort 3000');
 });
 
 

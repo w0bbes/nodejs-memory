@@ -8,6 +8,8 @@ function Table(tableID){
 	this.id = tableID;
 	this.status = 'available';
 	this.players = [];
+	this.playersID = [];
+	this.readyToPlayCounter = 0;
 	this.pack = [];
 	this.playerLimit = 2;
 	this.gameObj = null;
@@ -40,12 +42,14 @@ Table.prototype.addPlayer = function(player){
 			this.players.push(player);
 
 			if(this.players.length == this.playerLimit){
-				for(i = 0; i < this.player.length; i++){
+				for(i = 0; i < this.players.length; i++){
 					this.players[i].status = 'intable';
 				}
 			}
+			return true;
 		}
 	}
+	return false;
 }
 
 Table.prototype.removePlayer = function(player){

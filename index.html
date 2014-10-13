@@ -78,6 +78,10 @@
 			padding-left:50px;
 		}
 
+		#counter{
+			display: none;
+		}
+
 		#bottom{
 			position: absolute;
 			bottom: 0;
@@ -197,6 +201,7 @@
 		    transform: rotateX(0deg) rotateY(0deg);
 
 		}
+
     </style>
 
 </head>
@@ -213,6 +218,10 @@
 			<label for="name">Name: </label><input type="text" name="name" value="player1" id="name">
 			<input type="button" id="ready" value="Join table">
 		</div>
+		<div id="counter">
+
+		</div>
+		<div id="progressUpdate"></div>
 		<div id="game">
 			
 		</div>
@@ -261,6 +270,34 @@
 			$('#updates').append('<li>' + data.message + '</li>');
 		});
 
+		socket.on('timer', function(data){
+			$('#counter').html(data.countdown);
+			if(data.countdown === 0){
+				// uniek nodejs id terug
+				socket.emit('readyToPlay', {table:1});
+				$('#counter').hide();
+			}
+		});
+
+		socket.on('game', function(data){
+			console.log('current deck ' + data.deck);
+			
+		});
+
+		socket.on('turn', function(data){
+
+			$('.loading').remove();
+
+			if(data.myturn) {
+
+				$('#progressUpdate').html('<span class="label label-warning">It\'s your turn.</span>');
+
+		    } else {
+
+				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
+
+		    }
+		});
 
 		$(document).ready(function(){
 

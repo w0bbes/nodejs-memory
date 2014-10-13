@@ -1,9 +1,10 @@
 function Player(playerID){
 	this.id = playerID;
-	this.name = "";
-	this.tableID = "";
-	this.correct = "";
-	this.status = "available";
+	this.name = '';
+	this.tableID = '';
+	this.correct = '';
+	this.status = 'available';
+	this.turnFinished = '';
 }
 
 Player.prototype.setName = function(name){

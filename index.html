@@ -11,203 +11,243 @@
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
-
+    <style type="text/css" rel="stylesheet" href="/resources/style.css"></style>
 
     <style>
-		#chat{
 
-			width:300px;
-			height:100%;
+    body{
+	
+		background: #f3f3f3;
+	}
 
-			border:1px solid #eee;
+	#chat{
 
-			position:fixed;
-			top:0;
-			right:0;
-			bottom:0;
+		width:300px;
+		height:100%;
 
-		}
+		border:1px solid #eee;
 
-		#chat-form{
+		position:fixed;
+		top:0;
+		right:0;
+		bottom:0;
 
-			width:100%;
+	}
 
-			bottom:0;
-			position: absolute;
-		}
+	#chat-form{
 
-		#menu{
-			position: fixed;
-			left:0;
-			top:0;
-			bottom:0;
+		width:100%;
 
-			width:60px;
-			height:100%;
+		bottom:0;
+		position: absolute;
+	}
 
-			background-color:#3366AB;
-		}
-			#menu ul{
-				list-style: none;
-				margin:0;
-				padding:0;
+	#menu{
+		position: fixed;
+		left:0;
+		top:0;
+		bottom:0;
 
-				margin:20px 0 0 10px;
-			}
-			#menu li a{
-				color:#fff;
-				display: block; 
-				text-align: center;
+		width:60px;
+		height:100%;
 
-				width:40px;
-				height:40px;
-				line-height: 40px;
-
-				background:#3973bf;
-			}
-			#menu li a:hover{
-				background:#2c5891;
-			}
-
-		#content{
-			position:fixed;
-			left:60px;
-			top:0;
-			bottom:0;
-			right:300px;
-			padding-left:50px;
-		}
-
-		#counter{
-			display: none;
-		}
-
-		#bottom{
-			position: absolute;
-			bottom: 0;
-			left:0;
-			right:0;
-			height:160px;
-			background:#eee;
-		}
-			#updates{
-				list-style: none;
-				padding-top:20px;
-				padding-bottom:20px;
-				overflow-y: auto;
-			}
-
-		#chat--window{
-
+		background-color:#3366AB;
+	}
+		#menu ul{
+			list-style: none;
 			margin:0;
 			padding:0;
+
+			margin:20px 0 0 10px;
+		}
+		#menu li a{
+			color:#fff;
+			display: block; 
+			text-align: center;
+
+			width:40px;
+			height:40px;
+			line-height: 40px;
+
+			background:#3973bf;
+		}
+		#menu li a:hover{
+			background:#2c5891;
+		}
+
+	#content{
+		position:fixed;
+		left:60px;
+		top:0;
+		bottom:0;
+		right:300px;
+		padding-left:50px;
+	}
+
+	#counter{
+		display: none;
+	}
+
+	#bottom{
+		position: absolute;
+		bottom: 0;
+		left:0;
+		right:0;
+		height:160px;
+		background:#eee;
+
+		overflow-y: auto;
+	}
+		#updates{
 			list-style: none;
-
-		}
-			#chat--window li{
-				padding: 5px 3px;
-			}
-			#chat--window li:nth-child(even){
-				background-color:#eee;
-
-			}
-		#game{
-
-			width:960px;
-
+			padding-top:20px;
+			padding-bottom:20px;
 		}
 
-		.card{
-		    float:left;
-		    
-		    width:110px;
-		    height:110px;
-		    
-		    position:relative;    
-		    
-		    margin-right: 10px;
-		    margin-bottom: 10px;
-		    
-		    -webkit-perspective: 300px;
-		    -moz-perspective: 300px;
-		    perspective: 300px;
+	#chat--window{
+
+		margin:0;
+		padding:0;
+		list-style: none;
+
+	}
+		#chat--window li{
+			padding: 5px 3px;
 		}
-
-		.card--front, .card--back{
-		    float:none;
-		    position:absolute;
-		    top:0;
-		    left:0;
-		    
-		    text-align:center;
-		    color:white;
-		    
-		    width: inherit;
-		    height:inherit;
-		   
-		}
-		.card--front{
-		    background:#444;
-		    
-		    z-index:900;
-		    
-		    -webkit-transform: rotateX(0deg) rotateY(0deg);
-		    -moz-transform: rotateX(0deg) rotateY(0deg);
-		    transform: rotateX(0deg) rotateY(0deg);
-
-		    -webkit-transform-style: preserve-3d;
-		    -moz-transform-style: preserve-3d;
-		    transform-style: preserve-3d;
-
-		    -webkit-backface-visibility: hidden;
-		    -moz-backface-visibility: hidden;
-		    backface-visibility: hidden;
-
-		    
-		    -webkit-transition: all .4s ease-in-out;
-		    transition: all .4s ease-in-out;
+		#chat--window li:nth-child(even){
+			background-color:#eee;
 
 		}
+	#game{
 
-		.card.flip .card--front{
-		    
-		    z-index:900;
-		    
-		    -webkit-transform: rotateY(180deg);
-		    -moz-transform: rotateY(180deg);
-		    transform: rotateY(180deg);
-		    
-		}
-		.card--back{
-		    
-		    z-index:800;
-		    
-		    -webkit-transform: rotateY(-180deg);
-		    -moz-transform: rotateY(-179deg); 
-		    transform: rotateY(-179deg);
-		    
-		    -webkit-transform-style: preserve-3d;
-		    -moz-transform-style: preserve-3d;
-		    transform-style: preserve-3d;
-		    
-		    -webkit-backface-visibility: hidden;
-		    -moz-backface-visibility: hidden;
-		    backface-visibility: hidden;
-		    
-		    -webkit-transition: all .4s ease-in-out;
-		    transition: all .4s ease-in-out;
+		width:960px;
 
-		}
+	}
 
-		.card.flip .card--back{
-		    
-		    z-index:1000;
-		    
-		    -webkit-transform: rotateX(0deg) rotateY(0deg);
-		    -moz-transform: rotateX(0deg) rotateY(0deg);
-		    transform: rotateX(0deg) rotateY(0deg);
+	#progressUpdate{
+		margin: 10px 0;
+	}
 
-		}
+	.card{
+
+
+	    float:left;
+	    
+	    width:110px;
+	    height:110px;
+	    
+	    position:relative;    
+	    
+	    margin-right: 10px;
+	    margin-bottom: 10px;
+	    
+	    -webkit-perspective: 300px;
+	    -moz-perspective: 300px;
+	    perspective: 300px;
+	}
+
+	.card--front, .card--back{
+	    float:none;
+	    position:absolute;
+	    top:0;
+	    left:0;
+	    
+	    text-align:center;
+	    color:white;
+	    
+	    width: inherit;
+	    height:inherit;
+
+	    -webkit-box-shadow: 0.5px 0.866px 1px 0px rgba(0, 0, 0, 0.3);
+		-moz-box-shadow: 0.5px 0.866px 1px 0px rgba(0, 0, 0, 0.3);
+		box-shadow: 0.5px 0.866px 1px 0px rgba(0, 0, 0, 0.3);
+		
+	    background:#fff;
+	   
+	}
+	.card--front{
+
+
+	    
+	    z-index:900;
+	    
+	    -webkit-transform: rotateX(0deg) rotateY(0deg);
+	    -moz-transform: rotateX(0deg) rotateY(0deg);
+	    transform: rotateX(0deg) rotateY(0deg);
+
+	    -webkit-transform-style: preserve-3d;
+	    -moz-transform-style: preserve-3d;
+	    transform-style: preserve-3d;
+
+	    -webkit-backface-visibility: hidden;
+	    -moz-backface-visibility: hidden;
+	    backface-visibility: hidden;
+
+	    
+	    -webkit-transition: all .4s ease-in-out;
+	    transition: all .4s ease-in-out;
+
+	}
+
+	.blue--top{
+
+		height:100px;
+		width:100px;
+
+		margin: 5px 0 0 5px;
+
+		background: url(../resources/back-blue.jpg);
+	}
+
+	.card.flip .card--front{
+	    
+	    z-index:900;
+	    
+	    -webkit-transform: rotateY(180deg);
+	    -moz-transform: rotateY(180deg);
+	    transform: rotateY(180deg);
+	    
+	}
+	.card--back{
+	    
+	    z-index:800;
+
+	    
+	    -webkit-transform: rotateY(-180deg);
+	    -moz-transform: rotateY(-179deg); 
+	    transform: rotateY(-179deg);
+	    
+	    -webkit-transform-style: preserve-3d;
+	    -moz-transform-style: preserve-3d;
+	    transform-style: preserve-3d;
+	    
+	    -webkit-backface-visibility: hidden;
+	    -moz-backface-visibility: hidden;
+	    backface-visibility: hidden;
+	    
+	    -webkit-transition: all .4s ease-in-out;
+	    transition: all .4s ease-in-out;
+
+	}
+
+	.back--inner{
+
+	    margin-left: 5px;
+	    margin-top: 5px;
+
+	    height:100px;
+	    width:100px;
+
+	}
+	.card.flip .card--back, .card-flip .back--inner{
+	    
+	    z-index:1000;
+	    
+	    -webkit-transform: rotateX(0deg) rotateY(0deg);
+	    -moz-transform: rotateX(0deg) rotateY(0deg);
+	    transform: rotateX(0deg) rotateY(0deg);
+
+	}
 
     </style>
 
@@ -220,14 +260,18 @@
 		</ul>
 	</div>
 	<div id="content">
-		<h1>Welcome</h1>
+		<h1>Memory Multiplayer</h1>
 		<div id="splash">
-			<label for="name">Name: </label><input type="text" name="name" value="player1" id="name">
-			<input type="button" id="ready" value="Join table">
+			<div class="form-group">
+				<label for="name">Do you remember your name?</label><br> 
+				<input type="text" name="name" value="player1" class="form-control" id="name">
+			</div>
+			<input type="button" class="btn btn-primary" id="ready" value="Join table">
 		</div>
 		<div id="counter">
 
 		</div>
+
 		<div id="progressUpdate"></div>
 		<div id="game">
 			
@@ -274,7 +318,7 @@
 		});
 
 		socket.on('logging', function(data){
-			$('#updates').append('<li>' + data.message + '</li>');
+			$('#updates').prepend('<li>' + data.message + '</li>');
 		});
 
 		socket.on('timer', function(data){
@@ -298,7 +342,7 @@
 
 					var color = deck[index];
 
-					$('#game').append('<div class="card click" data-position="'+index+'"><div class="card--front"></div><div class="card--back" style="background:' + color + '"></div></div>');
+					$('#game').append('<div class="card click" data-position="'+index+'"><div class="card--front"><div class="blue--top"></div></div><div class="card--back"><div class="back--inner" style="background:' + color + '"></div></div></div>');
 				});
 
 			}, 300);
@@ -307,16 +351,37 @@
 
 		socket.on('turn', function(data){
 
-			$('.loading').remove();
+			$('#counter').fadeOut().remove();
+			$('.loading').fadeOut().remove();
+			$('#splash').fadeOut().remove();
 
 			if(data.myturn) {
 
 				$('#progressUpdate').html('<span class="label label-warning">It\'s your turn.</span>');
+				
+
+				$(document).on('click', '.click',function(){
+
+			    	if(!$(this).hasClass('flip')){		    		
+			    		
+			    		// emit turn event.
+			    		var pos = $(this).data('position');
+			    		socket.emit('flipCard', {pos: pos, tableID: 1});
+
+			    		console.log('card flipped ' + pos);
+
+			    		$(this).addClass('flip');
+
+			    	}else{
+			    		console.log('not your turn buddy');
+			    	}
+			    	
+			    });
 
 		    } else {
 
 				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
-
+				$('.click').unbind('click');
 		    }
 		});
 
@@ -331,21 +396,7 @@
 			});
 		});
 
-		$(document).on('click', '.click',function(){
-
-	    	if($(this).hasClass('flip')){
-	    		
-	    		$(this).removeClass('flip');
-
-	    	}else{
-	    		// emit turn event.
-	    		var pos = $(this).data('position');
-	    		socket.emit('flipCard', {pos: pos, tableID: 1});
-	    		console.log('card flipped ' + pos);
-	    		$(this).addClass('flip');
-
-	    	}
-	    });
+		
 
 		$(document).ready(function(){
 

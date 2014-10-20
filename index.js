@@ -161,7 +161,11 @@ io.sockets.on('connection', function(socket){
 	socket.on('flipCard', function(data){
 
 		var player = room.getPlayer(socket.id);
+
+		// tableID moet correct zijn!
 		var table = room.getTable(data.tableID);
+
+		var cardPos = data.pos;
 
 		/* 
 		- het kaartje ook bij de tegenstander omdraaien.
@@ -173,11 +177,11 @@ io.sockets.on('connection', function(socket){
 		- als het aantal 
 		*/
 
-		var cardPos = data.pos;
+		
 
 		for(var i = 0; i < table.players.length; i++){
 
-			// deze speler is niet aan de beurt
+			// deze speler is niet aan de beurt en krijgt een kaart omgedraaid
 			if(table.players[i].turnFinished){
 
 				io.to(table.players[i].id).emit('flip', {pos: cardPos});

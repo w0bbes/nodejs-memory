@@ -5,6 +5,7 @@ function Player(playerID){
 	this.correct = '';
 	this.status = 'available';
 	this.turnFinished = '';
+	this.flipCounter = 0;
 }
 
 Player.prototype.setName = function(name){
@@ -28,6 +29,24 @@ Player.prototype.removePlayer = function(playerID){
 Player.prototype.setStatus = function(status){
 
 	this.status = status;
+
+}
+
+Player.prototype.flipCounter = function(){
+
+	if(this.flipCounter <= 2){
+
+		this.turnFinished = false;
+
+	}else{
+		this.turnFinished = true;
+	}
+
+}
+
+Player.prototype.addToFlipCounter = function(){
+
+	return this.flipCounter++;
 
 }
 

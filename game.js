@@ -1,5 +1,6 @@
 function Game(){
 	this.pack = this.makeDeck();
+
 }
 
 Game.prototype.makeDeck = function(){

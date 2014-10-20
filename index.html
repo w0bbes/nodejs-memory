@@ -87,12 +87,14 @@
 			bottom: 0;
 			left:0;
 			right:0;
-			height:200px;
+			height:160px;
 			background:#eee;
 		}
 			#updates{
 				list-style: none;
 				padding-top:20px;
+				padding-bottom:20px;
+				overflow-y: auto;
 			}
 
 		#chat--window{
@@ -109,20 +111,26 @@
 				background-color:#eee;
 
 			}
+		#game{
+
+			width:960px;
+
+		}
 
 		.card{
 		    float:left;
 		    
-		    width:200px;
-		    height:200px;
+		    width:110px;
+		    height:110px;
 		    
 		    position:relative;    
 		    
-		    margin-right: 20px;
+		    margin-right: 10px;
+		    margin-bottom: 10px;
 		    
-		    -webkit-perspective: 600px;
-		    -moz-perspective: 600px;
-		    perspective: 600px;
+		    -webkit-perspective: 300px;
+		    -moz-perspective: 300px;
+		    perspective: 300px;
 		}
 
 		.card--front, .card--back{
@@ -171,7 +179,6 @@
 		    
 		}
 		.card--back{
-		    background: red;
 		    
 		    z-index:800;
 		    
@@ -280,8 +287,22 @@
 		});
 
 		socket.on('game', function(data){
-			console.log('current deck ' + data.deck);
+
+			var deck = data.deck;
 			
+			console.log(deck);
+
+			setTimeout(function(){
+
+				$.each(deck, function(index, value){
+
+					var color = deck[index];
+
+					$('#game').append('<div class="card click" data-position="'+index+'"><div class="card--front"></div><div class="card--back" style="background:' + color + '"></div></div>');
+				});
+
+			}, 300);
+
 		});
 
 		socket.on('turn', function(data){
@@ -299,21 +320,34 @@
 		    }
 		});
 
+		socket.on('flip', function(data){
+
+			var cards = $('.card');
+
+			$('.card').each(function(index){
+				if(index === data.pos){
+					$(this).addClass('flip');
+				}
+			});
+		});
+
+		$(document).on('click', '.click',function(){
+
+	    	if($(this).hasClass('flip')){
+	    		
+	    		$(this).removeClass('flip');
+
+	    	}else{
+	    		// emit turn event.
+	    		var pos = $(this).data('position');
+	    		socket.emit('flipCard', {pos: pos, tableID: 1});
+	    		console.log('card flipped ' + pos);
+	    		$(this).addClass('flip');
+
+	    	}
+	    });
+
 		$(document).ready(function(){
-
-
-		    $('.click').on('click',function(){
-
-		    	if($(this).hasClass('flip')){
-		    		
-		    		$(this).removeClass('flip');
-
-		    	}else{
-
-		    		$(this).addClass('flip');
-
-		    	}
-		    });
 
 		    $('#ready').on('click',function(){
 

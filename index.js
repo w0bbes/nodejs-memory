@@ -31,19 +31,8 @@ var room = new Room('test');
 room.tables = messaging.createSampleTables(1);
 
 /*
-
-var room = new Room('test');
-var table = new Table(1);
-var game = new Game();
-var player = new Player('test-new-id');
-
-table.setName('test room');
-room.tables = table;
-table.gameObj = game;
-table.pack = game.pack;
-
+	memory is 52 kaartjes... maar dit is wat te groot voor ons speelveld.
 */
-
 
 io.sockets.on('connection', function(socket){
 
@@ -142,13 +131,13 @@ io.sockets.on('connection', function(socket){
 
 					table.players[i].turnFinished = false;
 
-					console.log(table.players[i].name + ' will start.');
+					io.sockets.emit('logging',{message: table.players[i].name + ' will start.'});
 
 					io.to(table.players[i].id).emit('turn',{myturn: true});
 
 				}else{
 
-					console.log(table.players[i].name + ' will not start.');
+					io.sockets.emit('logging',{message: table.players[i].name + ' will not start.'});
 
 					table.players[i].turnFinished = true;
 
@@ -169,7 +158,40 @@ io.sockets.on('connection', function(socket){
 
 	});
 
-	socket.on('disconnect', function(client){
+	socket.on('flipCard', function(data){
+
+		var player = room.getPlayer(socket.id);
+		var table = room.getTable(data.tableID);
+
+		/* 
+		- het kaartje ook bij de tegenstander omdraaien.
+		- counter om te zien hoe vaak er een kaart is gedraaid.
+		- als er 1 kaartje is omgedraaid, counter op 1.
+		- als er een tweede kaartje is omgedraaid, dan check of het gelijk is aan het eerste kaartje.
+		- bij incorrecte combinatie, alle kaartjes omdraaien en beurt doorgeven (myTurn = false)
+		- bij correcte combinatie, player.correct verhogen.
+		- als het aantal 
+		*/
+
+		var cardPos = data.pos;
+
+		for(var i = 0; i < table.players.length; i++){
+
+			// deze speler is niet aan de beurt
+			if(table.players[i].turnFinished){
+
+				io.to(table.players[i].id).emit('flip', {pos: cardPos});
+				console.log('event flip send on card ' + cardPos + ' to '+ table.players[i].id);
+
+			}
+
+		}
+
+		
+
+	});
+
+	socket.on('disconnect', function(){
 
 		// huidige player opzoeken op socket id
 		var player = room.getPlayer(socket.id);

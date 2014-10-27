@@ -6,6 +6,7 @@ function Player(playerID){
 	this.status = 'available';
 	this.turnFinished = '';
 	this.flipCounter = 0;
+	this.flippedColor = [];
 }
 
 Player.prototype.setName = function(name){

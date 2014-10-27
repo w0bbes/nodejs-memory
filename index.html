@@ -342,10 +342,12 @@
 
 					var color = deck[index];
 
-					$('#game').append('<div class="card click" data-position="'+index+'"><div class="card--front"><div class="blue--top"></div></div><div class="card--back"><div class="back--inner" style="background:' + color + '"></div></div></div>');
+					$(this).delay(100*index).fadeIn(100);
+
+					$('#game').append('<div class="card click" data="'+color+'" data-position="'+index+'"><div class="card--front"><div class="blue--top"></div></div><div class="card--back"><div class="back--inner" style="background:' + color + '"></div></div></div>');
 				});
 
-			}, 300);
+			});
 
 		});
 
@@ -362,19 +364,20 @@
 
 				$(document).on('click', '.click',function(){
 
-			    	if(!$(this).hasClass('flip')){		    		
-			    		
-			    		// emit turn event.
-			    		var pos = $(this).data('position');
-			    		socket.emit('flipCard', {pos: pos, tableID: 1});
+					if(!$(this).hasClass('flip')){		    		
+						
+						// emit turn event.
+						var pos = $(this).data('position');
+						var color = $(this).data('color');
+						socket.emit('flipCard', {pos: pos, tableID: 1, color: color});
 
-			    		console.log('card flipped ' + pos);
+						console.log('card flipped ' + pos);
 
-			    		$(this).addClass('flip');
+						$(this).addClass('flip');
 
-			    	}else{
-			    		console.log('not your turn buddy');
-			    	}
+					}else{
+						console.log('not your turn buddy');
+					}
 			    	
 			    });
 

@@ -167,6 +167,10 @@ io.sockets.on('connection', function(socket){
 
 		var cardPos = data.pos;
 
+		var flippedColor = data.color;
+
+		
+
 		/* 
 		- het kaartje ook bij de tegenstander omdraaien.
 		- counter om te zien hoe vaak er een kaart is gedraaid.
@@ -177,21 +181,61 @@ io.sockets.on('connection', function(socket){
 		- als het aantal 
 		*/
 
-		
+		console.log('de flip counter: ' + player.flipCounter);
+
+
+
+				//kijken hoevaak speler heeft geklikt.
+
+					// binnen die loop de counter ophogen en daarna kijken of de counter al op 2 staat
+
+				// deze speler is niet aan de beurt en krijgt een kaart omgedraaid
 
 		for(var i = 0; i < table.players.length; i++){
 
-			// deze speler is niet aan de beurt en krijgt een kaart omgedraaid
 			if(table.players[i].turnFinished){
 
 				io.to(table.players[i].id).emit('flip', {pos: cardPos});
 				console.log('event flip send on card ' + cardPos + ' to '+ table.players[i].id);
 
+
+			}else{
+
+				table.players[i].flippedColor.push(data.color);
+
+
+				if(table.players[i].flipCounter === 1){
+
+
+					// check als ze correct, zo ja, dan flipcounter op nul
+					// als ze niet matches, emit new turn, turnfinished op true, andere turn finished op false
+					console.log('new turn');
+
+					if( table.players[i].flippedColor.AllValuesSame() ){
+
+						table.players[i].correct++;
+
+						console.log('cards correct');
+
+					}else{
+
+						table.players[i].turnFinished === true;
+
+					}
+
+				}else{
+
+					table.players[i].flipCounter++;	
+
+				}
+				
+				console.log(room);
+
 			}
+
 
 		}
 
-		
 
 	});
 
@@ -227,3 +271,14 @@ Object.size = function(obj) {
 };
 
 
+Array.prototype.AllValuesSame = function(){
+
+    if(this.length > 0) {
+        for(var i = 1; i < this.length; i++)
+        {
+            if(this[i] !== this[0])
+                return false;
+        }
+    } 
+    return true;
+}

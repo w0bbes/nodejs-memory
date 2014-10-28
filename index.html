@@ -85,7 +85,7 @@
 	}
 
 	#counter{
-		display: none;
+		
 	}
 
 	#bottom{
@@ -322,7 +322,8 @@
 		});
 
 		socket.on('timer', function(data){
-			$('#counter').html(data.countdown);
+			$('#counter').html('<h1>' + data.countdown + '</h1>');
+			console.log(data.countdown);
 			if(data.countdown === 0){
 				// uniek nodejs id terug
 				socket.emit('readyToPlay', {table:1});
@@ -386,6 +387,61 @@
 				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
 				$('.click').unbind('click');
 		    }
+		});
+
+		socket.on('flipCardsBack', function(data){
+
+			console.log('flipping cards');
+
+			var cards = $('.card');
+
+			$('.card').each(function(index){
+
+				console.log('checking cards for flip');
+
+				if($(this).hasClass('flip')){
+					$(this).removeClass('flip');
+				}
+
+			});
+
+
+		});
+
+		socket.on('newTurn', function(data){
+
+			console.log('switching turns');
+
+			if(data.myturn) {
+
+				$('#progressUpdate').html('<span class="label label-warning">It\'s your turn.</span>');
+				
+
+				$(document).on('click', '.click',function(){
+
+					if(!$(this).hasClass('flip')){		    		
+						
+						// emit turn event.
+						var pos = $(this).data('position');
+						var color = $(this).data('color');
+						socket.emit('flipCard', {pos: pos, tableID: 1, color: color});
+
+						console.log('card flipped ' + pos);
+
+						$(this).addClass('flip');
+
+					}else{
+						console.log('not your turn buddy');
+					}
+			    	
+			    });
+
+		    } else {
+
+				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
+				$('.click').unbind('click');
+		    }
+
 		});
 
 		socket.on('flip', function(data){

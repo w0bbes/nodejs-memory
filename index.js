@@ -91,7 +91,7 @@ io.sockets.on('connection', function(socket){
 			}else{
 				io.sockets.emit('logging',{message: 'Enough players, starting'});
 
-				var countdown = 1; //3 seconds in reality...
+				var countdown = 3; //3 seconds in reality...
 		        setInterval(function() {
 		          countdown--;
 		          io.sockets.emit('timer', { countdown: countdown });
@@ -160,42 +160,23 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('flipCard', function(data){
 
-		var player = room.getPlayer(socket.id);
+		// heb geen socket.id ?!
+		//var player = room.getPlayer(socket.id);
 
-		// tableID moet correct zijn!
 		var table = room.getTable(data.tableID);
-
 		var cardPos = data.pos;
-
 		var flippedColor = data.color;
 
-		
-
-		/* 
-		- het kaartje ook bij de tegenstander omdraaien.
-		- counter om te zien hoe vaak er een kaart is gedraaid.
-		- als er 1 kaartje is omgedraaid, counter op 1.
-		- als er een tweede kaartje is omgedraaid, dan check of het gelijk is aan het eerste kaartje.
-		- bij incorrecte combinatie, alle kaartjes omdraaien en beurt doorgeven (myTurn = false)
-		- bij correcte combinatie, player.correct verhogen.
-		- als het aantal 
-		*/
-
-		console.log('de flip counter: ' + player.flipCounter);
-
-
-
-				//kijken hoevaak speler heeft geklikt.
-
-					// binnen die loop de counter ophogen en daarna kijken of de counter al op 2 staat
-
-				// deze speler is niet aan de beurt en krijgt een kaart omgedraaid
 
 		for(var i = 0; i < table.players.length; i++){
 
 			if(table.players[i].turnFinished){
 
+				// hier is geen flip op de tegenstander als ht de tweede flip is.
+
 				io.to(table.players[i].id).emit('flip', {pos: cardPos});
+
+
 				console.log('event flip send on card ' + cardPos + ' to '+ table.players[i].id);
 
 
@@ -203,15 +184,12 @@ io.sockets.on('connection', function(socket){
 
 				table.players[i].flippedColor.push(data.color);
 
-
 				if(table.players[i].flipCounter === 1){
-
 
 					// check als ze correct, zo ja, dan flipcounter op nul
 					// als ze niet matches, emit new turn, turnfinished op true, andere turn finished op false
-					console.log('new turn');
 
-					console.log(table.players[i].flippedColor);
+					
 
 					if( table.players[i].flippedColor.AllValuesSame() ){
 
@@ -221,41 +199,83 @@ io.sockets.on('connection', function(socket){
 
 						console.log('cards correct, not emitting next turn');
 
-						table.players[i].turnFinished = true;
+						table.players[i].flipCounter = 0;
+						table.players[i].flippedColor = [];
+
+						table.correctPairs++;
+
+						console.log(room);
+
+						io.sockets.emit('flipCardsBack');
+
+						
 
 					}else{
-
-						//table.players[i].turnFinished === true;
 
 						console.log('cards wrong, emitting next turn');
 
 
-						for(var j = 0; j < table.players.length; j++){
+						//var remaining = table.players;
 
-							if(table.players[i].id === table.players[j].id){
+						//console.log(remaining[0].id);
 
-								io.to(table.players[j].id).emit('turn',{myturn: false});
-								
+
+						//console.log('remaining' + JSON.stringify(table.players));
+						//console.log('this player '+ JSON.stringify(table.players[i]));
+						
+						//setTimeout(function(){
+
+						//},3000);
+
+
+						
+						for(var k = 0; k < table.players.length; k++){
+
+							if(table.players[k].id === table.players[i].id){
+
+								// huidige speler
+								console.log('not my turn ' + table.players[i].id);
+								io.to(table.players[i].id).emit('newTurn',{myturn: false});
+
+								table.players[i].turnFinished = true;
+								table.players[i].flipCounter = 0;
+								table.players[i].flippedColor = [];
 
 							}else{
 
-								io.to(table.players[j].id).emit('turn',{myturn: true});
-								table.players[j].turnFinished = false;
+								console.log('myturn ' + table.players[k].id);
+								io.to(table.players[k].id).emit('newTurn',{myturn: true});
+
+								table.players[k].turnFinished = false;
+								table.players[k].flipCounter = 0;
 
 							}
 
 						}
 
+						io.sockets.emit('flipCardsBack');
+
+						//io.to(table.players[i].id).emit('newTurn',{myturn: false});
+
+
+						
+
+						//io.sockets.emit('flipCardsBack');
+						
+
+						console.log(room);
+						// flip all cards back
+						
 
 					}
 
 				}else{
 
 					table.players[i].flipCounter++;	
+					console.log(room);
 
 				}
 				
-				console.log(room);
 
 			}
 
@@ -308,3 +328,13 @@ Array.prototype.AllValuesSame = function(){
     } 
     return true;
 }
+
+Array.prototype.spliced = function() {
+ 
+	// Returns the array of values deleted from array.
+	Array.prototype.splice.apply( this, arguments );
+
+	// Return current (mutated) array array reference.
+	return( this );
+
+};

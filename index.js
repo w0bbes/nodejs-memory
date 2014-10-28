@@ -211,15 +211,41 @@ io.sockets.on('connection', function(socket){
 					// als ze niet matches, emit new turn, turnfinished op true, andere turn finished op false
 					console.log('new turn');
 
+					console.log(table.players[i].flippedColor);
+
 					if( table.players[i].flippedColor.AllValuesSame() ){
+
+						//table.correctPairs omhoog. Zodat je ook weet hoeveel er correct zijn per tafel
 
 						table.players[i].correct++;
 
-						console.log('cards correct');
+						console.log('cards correct, not emitting next turn');
+
+						table.players[i].turnFinished = true;
 
 					}else{
 
-						table.players[i].turnFinished === true;
+						//table.players[i].turnFinished === true;
+
+						console.log('cards wrong, emitting next turn');
+
+
+						for(var j = 0; j < table.players.length; j++){
+
+							if(table.players[i].id === table.players[j].id){
+
+								io.to(table.players[j].id).emit('turn',{myturn: false});
+								
+
+							}else{
+
+								io.to(table.players[j].id).emit('turn',{myturn: true});
+								table.players[j].turnFinished = false;
+
+							}
+
+						}
+
 
 					}
 

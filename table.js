@@ -14,6 +14,7 @@ function Table(tableID){
 	this.playerLimit = 2;
 	this.gameObj = null;
 	this.name = ""; 
+	this.pairCorrect = 0;
 }
 
 Table.prototype.setName = function(name){

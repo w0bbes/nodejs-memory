@@ -202,7 +202,7 @@ io.sockets.on('connection', function(socket){
 						table.players[i].flipCounter = 0;
 						table.players[i].flippedColor = [];
 
-						table.correctPairs++;
+						table.pairCorrect++;
 
 						console.log(room);
 
@@ -234,20 +234,21 @@ io.sockets.on('connection', function(socket){
 							if(table.players[k].id === table.players[i].id){
 
 								// huidige speler
-								console.log('not my turn ' + table.players[i].id);
-								io.to(table.players[i].id).emit('newTurn',{myturn: false});
+								console.log('not my turn anymore ' + table.players[i].id);
 
 								table.players[i].turnFinished = true;
 								table.players[i].flipCounter = 0;
 								table.players[i].flippedColor = [];
 
+								io.to(table.players[i].id).emit('newTurn',{myturn: false});
+
 							}else{
 
-								console.log('myturn ' + table.players[k].id);
-								io.to(table.players[k].id).emit('newTurn',{myturn: true});
+								console.log('its my turn ' + table.players[k].id);
 
 								table.players[k].turnFinished = false;
-								table.players[k].flipCounter = 0;
+
+								io.to(table.players[k].id).emit('newTurn',{myturn: true});
 
 							}
 

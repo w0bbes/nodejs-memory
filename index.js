@@ -203,6 +203,7 @@ Speler voert naam in en klikt op Ready
 
                     if (table.players[i].flippedColor.AllValuesSame()) {
                         // correct
+                        console.log('CORRECTERINO!');
 
                     }else{
                         // incorrect
@@ -218,9 +219,11 @@ Speler voert naam in en klikt op Ready
                                 table.players[i].flipCounter = 0;
                                 table.players[i].flippedColor = [];
 
+                                
                                 io.to(table.players[i].id).emit('newTurn', {
                                     myturn: false
                                 });
+
 
                             } else {
 
@@ -229,29 +232,34 @@ Speler voert naam in en klikt op Ready
                                 table.players[k].turnFinished = false;
                                 table.players[k].flipCounter = 0;
 
+                                
                                 io.to(table.players[k].id).emit('newTurn', {
                                     myturn: true
                                 });
+
 
                             }
 
                         }
 
-                        io.sockets.emit('flipCardsBack');
+                        
 
                     }
+
 
 
                 }
 
             }else{
 
+                console.log('event flip send on card ' + cardPos + ' to ' + table.players[i].id);
+
                 io.to(table.players[i].id).emit('flip', {
                     pos: cardPos
                 });
 
 
-                console.log('event flip send on card ' + cardPos + ' to ' + table.players[i].id);
+                
 
             }
 

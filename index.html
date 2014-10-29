@@ -389,7 +389,7 @@
 		    }
 		});
 
-		socket.on('flipCardsBack', function(data){
+		function turnCards(){
 
 			console.log('flipping cards');
 
@@ -401,23 +401,23 @@
 
 				if($(this).hasClass('flip')){
 					$(this).removeClass('flip');
+					console.log('removed flip');
 				}
 
 			});
-
-
-		});
+		}
 
 		socket.on('newTurn', function(data){
 
 			console.log('switching turns');
+			turnCards();
 
 			if(data.myturn) {
 
 				$('#progressUpdate').html('<span class="label label-warning">It\'s your turn.</span>');
 				
 
-				$(document).on('click', '.click',function(){
+				$(document).on('click', '.click', function(){
 
 					if(!$(this).hasClass('flip')){		    		
 						
@@ -436,10 +436,13 @@
 			    	
 			    });
 
+
+
 		    } else {
 
 				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
-				$('.click').unbind('click');
+				$('.click').off('click','**');
+				$(document).off('click', '.click');
 		    }
 
 		});

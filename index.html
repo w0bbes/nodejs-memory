@@ -399,9 +399,9 @@
 
 				console.log('checking cards for flip');
 
-				
-				$(this).removeClass('flip');
-				
+				if($(this).hasClass('flip')){
+					$(this).removeClass('flip');
+				}
 
 			});
 
@@ -450,9 +450,7 @@
 
 			$('.card').each(function(index){
 				if(index === data.pos){
-					if($(this).hasClass('flip')){
-						$(this).addClass('flip');
-					}
+					$(this).addClass('flip');
 				}
 			});
 		});

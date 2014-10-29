@@ -20,8 +20,8 @@ var server = http.createServer(app);
 server.listen(3000);
 var io = socket.listen(server);
 
-app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
+app.get('/', function(req, res) {
+    res.sendfile(__dirname + '/index.html');
 });
 
 io.set("log level", 1);
@@ -31,286 +31,381 @@ var room = new Room('test');
 room.tables = messaging.createSampleTables(1);
 
 /*
-	memory is 52 kaartjes... maar dit is wat te groot voor ons speelveld.
+memory is 52 kaartjes... maar dit is wat te groot voor ons speelveld.
 */
 
-io.sockets.on('connection', function(socket){
+io.sockets.on('connection', function(socket) {
 
-	/*
-		Speler voert naam in en klikt op Ready
-	*/
+    /*
+Speler voert naam in en klikt op Ready
+*/
 
-	socket.on('connectToServer', function(data){
+    socket.on('connectToServer', function(data) {
 
-		// welke user komt er binnen en met welk id
-		console.log('new user with id: ' + socket.id);
+        // welke user komt er binnen en met welk id
+        console.log('new user with id: ' + socket.id);
 
-		// nieuw Player object maken met het id van de socket
-		var player = new Player(socket.id);
+        // nieuw Player object maken met het id van de socket
+        var player = new Player(socket.id);
 
-		// zet de naam afhankelijk van het veld 'name'
-		var name = data;
+        // zet de naam afhankelijk van het veld 'name'
+        var name = data;
 
-		player.setName(name);
+        player.setName(name);
 
-		// zet de status naar 'intable'
-		player.setStatus('intable');
+        // zet de status naar 'intable'
+        player.setStatus('intable');
 
-		// voeg de speler toe aan een 'room'
-		room.addPlayer(player);
-		// stuur een bericht dat er een nieuwe user bij is gekomen.
-		io.sockets.emit('logging',{message: name + ' has connected'});
+        // voeg de speler toe aan een 'room'
+        room.addPlayer(player);
+        // stuur een bericht dat er een nieuwe user bij is gekomen.
+        io.sockets.emit('logging', {
+            message: name + ' has connected'
+        });
 
-		console.log(room);
+        console.log(room);
 
-	});
+    });
 
 
-	socket.on('connectToTable', function(data){
+    socket.on('connectToTable', function(data) {
 
-		// dit returned juiste object
-		var player = room.getPlayer(socket.id);	
+        // dit returned juiste object
+        var player = room.getPlayer(socket.id);
 
-		// zou een object moeten returnen
-		var table = room.getTable(data.tableID);
+        // zou een object moeten returnen
+        var table = room.getTable(data.tableID);
 
-		console.log('table' + table.id + '');
+        console.log('table' + table.id + '');
 
-		if( table.addPlayer(player) && table.isTableAvailable() ){
+        if (table.addPlayer(player) && table.isTableAvailable()) {
 
-			player.tableID = table.id;
-			player.status = 'intable';
+            player.tableID = table.id;
+            player.status = 'intable';
 
-			table.playersID.push(socket.id);
+            table.playersID.push(socket.id);
 
-			io.sockets.emit('logging', {message: player.name + 'has connected to table ' + table.name + '.'});
+            io.sockets.emit('logging', {
+                message: player.name + 'has connected to table ' + table.name + '.'
+            });
 
-			if(table.players.length < 2){
-				io.sockets.emit('logging',{message: 'There is ' + table.players.length + ' player at this table. There are '+ table.playerLimit + ' needed to start'});
-				io.sockets.emit('logging',{message: 'Waiting for other players'});
-			}else{
-				io.sockets.emit('logging',{message: 'Enough players, starting'});
+            if (table.players.length < 2) {
+                io.sockets.emit('logging', {
+                    message: 'There is ' + table.players.length + ' player at this table. There are ' + table.playerLimit + ' needed to start'
+                });
+                io.sockets.emit('logging', {
+                    message: 'Waiting for other players'
+                });
+            } else {
+                io.sockets.emit('logging', {
+                    message: 'Enough players, starting'
+                });
 
-				var countdown = 3; //3 seconds in reality...
-		        setInterval(function() {
-		          countdown--;
-		          io.sockets.emit('timer', { countdown: countdown });
-		        }, 1000);
+                var countdown = 3; //3 seconds in reality...
+                setInterval(function() {
+                    countdown--;
+                    io.sockets.emit('timer', {
+                        countdown: countdown
+                    });
+                }, 1000);
 
-			}
+            }
 
-		}else{
-			console.log('niks');
-		}
+        } else {
+            console.log('niks');
+        }
 
-	});
+    });
 
-	socket.on('readyToPlay', function(data){
+    socket.on('readyToPlay', function(data) {
 
-		console.log('Ready to play!');
+        console.log('Ready to play!');
 
-		var player = room.getPlayer(socket.id);
-		var table = room.getTable(data.table);
-		player.status = 'playing';
+        var player = room.getPlayer(socket.id);
+        var table = room.getTable(data.table);
+        player.status = 'playing';
 
-		table.readyToPlayCounter++;
+        table.readyToPlayCounter++;
 
-		var randomNumber = Math.floor(Math.random() * table.playerLimit); 
+        var randomNumber = Math.floor(Math.random() * table.playerLimit);
 
-		if(table.readyToPlayCounter === table.playerLimit){
+        if (table.readyToPlayCounter === table.playerLimit) {
 
-			table.status = 'unavailable';
+            table.status = 'unavailable';
 
-			io.sockets.emit('game', {deck: table.pack});
+            io.sockets.emit('game', {
+                deck: table.pack
+            });
 
-			for(var i = 0; i < table.players.length; i++){
+            for (var i = 0; i < table.players.length; i++) {
 
-				var startingPlayerId = table.playersID[randomNumber];
+                var startingPlayerId = table.playersID[randomNumber];
 
-				if(table.players[i].id === startingPlayerId){
+                if (table.players[i].id === startingPlayerId) {
 
-					table.players[i].turnFinished = false;
+                    table.players[i].turnFinished = false;
 
-					io.sockets.emit('logging',{message: table.players[i].name + ' will start.'});
+                    io.sockets.emit('logging', {
+                        message: table.players[i].name + ' will start.'
+                    });
 
-					io.to(table.players[i].id).emit('turn',{myturn: true});
+                    io.to(table.players[i].id).emit('turn', {
+                        myturn: true
+                    });
 
-				}else{
+                } else {
 
-					io.sockets.emit('logging',{message: table.players[i].name + ' will not start.'});
+                    io.sockets.emit('logging', {
+                        message: table.players[i].name + ' will not start.'
+                    });
 
-					table.players[i].turnFinished = true;
+                    table.players[i].turnFinished = true;
 
-					io.to(table.players[i].id).emit('turn',{myturn: false});
+                    io.to(table.players[i].id).emit('turn', {
+                        myturn: false
+                    });
 
-				}
+                }
 
-			}
+            }
 
-		}
+        }
 
-	});
-	
+    });
 
-	socket.on('chat message', function(msg){
 
-		io.emit('chat message', msg);
+    socket.on('chat message', function(msg) {
 
-	});
+        io.emit('chat message', msg);
 
-	socket.on('flipCard', function(data){
+    });
 
-		// heb geen socket.id ?!
-		//var player = room.getPlayer(socket.id);
+    socket.on('flipCard', function(data) {
 
-		var table = room.getTable(data.tableID);
-		var cardPos = data.pos;
-		var flippedColor = data.color;
+        // heb geen socket.id ?!
+        //var player = room.getPlayer(socket.id);
 
+        console.log(socket.id);
 
-		for(var i = 0; i < table.players.length; i++){
+        var table = room.getTable(data.tableID);
+        var cardPos = data.pos;
+        var flippedColor = data.color;
 
-			if(table.players[i].turnFinished){
 
-				// hier is geen flip op de tegenstander als ht de tweede flip is.
+        for (var i = 0; i < table.players.length; i++) {
 
-				io.to(table.players[i].id).emit('flip', {pos: cardPos});
+            if(table.players[i].id === socket.id && !table.players[i].turnFinished){
 
+                table.players[i].flippedColor.push(data.color);
+                table.players[i].flipCounter++;
 
-				console.log('event flip send on card ' + cardPos + ' to '+ table.players[i].id);
+                if (table.players[i].flipCounter === 2) {
 
+                    if (table.players[i].flippedColor.AllValuesSame()) {
+                        // correct
 
-			}else{
+                    }else{
+                        // incorrect
 
-				table.players[i].flippedColor.push(data.color);
+                        for (var k = 0; k < table.players.length; k++) {
 
-				if(table.players[i].flipCounter === 1){
+                            if (table.players[k].id === table.players[i].id) {
 
-					// check als ze correct, zo ja, dan flipcounter op nul
-					// als ze niet matches, emit new turn, turnfinished op true, andere turn finished op false
+                                // huidige speler
+                                console.log('not my turn anymore ' + table.players[i].id);
 
-					
+                                table.players[i].turnFinished = true;
+                                table.players[i].flipCounter = 0;
+                                table.players[i].flippedColor = [];
 
-					if( table.players[i].flippedColor.AllValuesSame() ){
+                                io.to(table.players[i].id).emit('newTurn', {
+                                    myturn: false
+                                });
 
-						//table.correctPairs omhoog. Zodat je ook weet hoeveel er correct zijn per tafel
+                            } else {
 
-						table.players[i].correct++;
+                                console.log('its my turn ' + table.players[k].id);
 
-						console.log('cards correct, not emitting next turn');
+                                table.players[k].turnFinished = false;
+                                table.players[k].flipCounter = 0;
 
-						table.players[i].flipCounter = 0;
-						table.players[i].flippedColor = [];
+                                io.to(table.players[k].id).emit('newTurn', {
+                                    myturn: true
+                                });
 
-						table.pairCorrect++;
+                            }
 
-						console.log(room);
+                        }
 
-						io.sockets.emit('flipCardsBack');
+                        io.sockets.emit('flipCardsBack');
 
-						
+                    }
 
-					}else{
 
-						console.log('cards wrong, emitting next turn');
+                }
 
+            }else{
 
-						//var remaining = table.players;
+                io.to(table.players[i].id).emit('flip', {
+                    pos: cardPos
+                });
 
-						//console.log(remaining[0].id);
 
+                console.log('event flip send on card ' + cardPos + ' to ' + table.players[i].id);
 
-						//console.log('remaining' + JSON.stringify(table.players));
-						//console.log('this player '+ JSON.stringify(table.players[i]));
-						
-						//setTimeout(function(){
+            }
 
-						//},3000);
+            /*
+            if (table.players[i].turnFinished) {
 
+                // hier is geen flip op de tegenstander als ht de tweede flip is.
 
-						
-						for(var k = 0; k < table.players.length; k++){
+                io.to(table.players[i].id).emit('flip', {
+                    pos: cardPos
+                });
 
-							if(table.players[k].id === table.players[i].id){
 
-								// huidige speler
-								console.log('not my turn anymore ' + table.players[i].id);
+                console.log('event flip send on card ' + cardPos + ' to ' + table.players[i].id);
 
-								table.players[i].turnFinished = true;
-								table.players[i].flipCounter = 0;
-								table.players[i].flippedColor = [];
 
-								io.to(table.players[i].id).emit('newTurn',{myturn: false});
+            } else {
 
-							}else{
+                table.players[i].flippedColor.push(data.color);
 
-								console.log('its my turn ' + table.players[k].id);
+                if (table.players[i].flipCounter === 1) {
 
-								table.players[k].turnFinished = false;
+                    // check als ze correct, zo ja, dan flipcounter op nul
+                    // als ze niet matches, emit new turn, turnfinished op true, andere turn finished op false
 
-								io.to(table.players[k].id).emit('newTurn',{myturn: true});
 
-							}
 
-						}
+                    if (table.players[i].flippedColor.AllValuesSame()) {
 
-						io.sockets.emit('flipCardsBack');
+                        //table.correctPairs omhoog. Zodat je ook weet hoeveel er correct zijn per tafel
 
-						//io.to(table.players[i].id).emit('newTurn',{myturn: false});
+                        table.players[i].correct++;
 
+                        console.log('cards correct, not emitting next turn');
 
-						
+                        table.players[i].flipCounter = 0;
+                        table.players[i].flippedColor = [];
 
-						//io.sockets.emit('flipCardsBack');
-						
+                        table.pairCorrect++;
 
-						console.log(room);
-						// flip all cards back
-						
+                        console.log(room);
 
-					}
+                        io.sockets.emit('flipCardsBack');
 
-				}else{
 
-					table.players[i].flipCounter++;	
-					console.log(room);
 
-				}
-				
+                    } else {
 
-			}
+                        console.log('cards wrong, emitting next turn');
 
 
-		}
+                        //var remaining = table.players;
 
+                        //console.log(remaining[0].id);
 
-	});
 
-	socket.on('disconnect', function(){
+                        //console.log('remaining' + JSON.stringify(table.players));
+                        //console.log('this player '+ JSON.stringify(table.players[i]));
 
-		// huidige player opzoeken op socket id
-		var player = room.getPlayer(socket.id);
+                        //setTimeout(function(){
 
-		// speler bestaat en zit aan tafel
-		if(player && player.status === 'intable'){
+                        //},3000);
 
-			var table = room.getTable(player.tableID);
 
-			table.removePlayer(player);
-			table.status = 'available';
-			player.status = 'available';
 
-			io.sockets.emit('logging', player.name + 'has left the building');
+                        for (var k = 0; k < table.players.length; k++) {
 
-		}
+                            if (table.players[k].id === table.players[i].id) {
 
-	});
+                                // huidige speler
+                                console.log('not my turn anymore ' + table.players[i].id);
+
+                                table.players[i].turnFinished = true;
+                                table.players[i].flipCounter = 0;
+                                table.players[i].flippedColor = [];
+
+                                io.to(table.players[i].id).emit('newTurn', {
+                                    myturn: false
+                                });
+
+                            } else {
+
+                                console.log('its my turn ' + table.players[k].id);
+
+                                table.players[k].turnFinished = false;
+                                table.players[k].flipCounter = 0;
+
+                                io.to(table.players[k].id).emit('newTurn', {
+                                    myturn: true
+                                });
+
+                            }
+
+                        }
+
+                        io.sockets.emit('flipCardsBack');
+
+                        //io.to(table.players[i].id).emit('newTurn',{myturn: false});
+
+
+
+
+                        //io.sockets.emit('flipCardsBack');
+
+
+                        //console.log(room);
+                        // flip all cards back
+
+
+                    }
+
+                } else {
+
+                    table.players[i].flipCounter++;
+                    
+
+                }
+
+
+            }
+
+        */
+        }
+
+        console.log(room);
+
+    });
+
+    socket.on('disconnect', function() {
+
+        // huidige player opzoeken op socket id
+        var player = room.getPlayer(socket.id);
+
+        // speler bestaat en zit aan tafel
+        if (player && player.status === 'intable') {
+
+            var table = room.getTable(player.tableID);
+
+            table.removePlayer(player);
+            table.status = 'available';
+            player.status = 'available';
+
+            io.sockets.emit('logging', player.name + 'has left the building');
+
+        }
+
+    });
 
 });
 
 
-Object.size = function(obj) {  
-    var size = 0, key;
+Object.size = function(obj) {
+    var size = 0,
+        key;
     for (key in obj) {
         if (obj.hasOwnProperty(key)) size++;
     }
@@ -318,24 +413,23 @@ Object.size = function(obj) {
 };
 
 
-Array.prototype.AllValuesSame = function(){
+Array.prototype.AllValuesSame = function() {
 
-    if(this.length > 0) {
-        for(var i = 1; i < this.length; i++)
-        {
-            if(this[i] !== this[0])
+    if (this.length > 0) {
+        for (var i = 1; i < this.length; i++) {
+            if (this[i] !== this[0])
                 return false;
         }
-    } 
+    }
     return true;
 }
 
 Array.prototype.spliced = function() {
- 
-	// Returns the array of values deleted from array.
-	Array.prototype.splice.apply( this, arguments );
 
-	// Return current (mutated) array array reference.
-	return( this );
+    // Returns the array of values deleted from array.
+    Array.prototype.splice.apply(this, arguments);
+
+    // Return current (mutated) array array reference.
+    return (this);
 
 };

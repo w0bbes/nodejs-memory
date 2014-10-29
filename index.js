@@ -192,6 +192,12 @@ Speler voert naam in en klikt op Ready
         var flippedColor = data.color;
 
 
+        /*
+
+            De bugs !! Ontstaan omdat je twee keer de players langs gaat!!!1
+
+        */
+
         for (var i = 0; i < table.players.length; i++) {
 
             if(table.players[i].id === socket.id && !table.players[i].turnFinished){
@@ -246,19 +252,21 @@ Speler voert naam in en klikt op Ready
 
                     }
 
-
+                    io.sockets.emit('flipCardsBack');
 
                 }
 
             }else{
 
-                console.log('event flip send on card ' + cardPos + ' to ' + table.players[i].id);
+                if(table.players[i].turnFinished === true){
 
-                io.to(table.players[i].id).emit('flip', {
-                    pos: cardPos
-                });
+                    console.log('event flip send on card ' + cardPos + ' to ' + table.players[i].id);
 
+                    io.to(table.players[i].id).emit('flip', {
+                        pos: cardPos
+                    });
 
+                }
                 
 
             }

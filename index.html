@@ -389,7 +389,7 @@
 		    }
 		});
 
-		function turnCards(){
+		socket.on('flipCardsBack', function(data){
 
 			console.log('flipping cards');
 
@@ -401,16 +401,17 @@
 
 				if($(this).hasClass('flip')){
 					$(this).removeClass('flip');
-					console.log('removed flip');
+					console.log('flip removed');
 				}
 
 			});
-		}
+
+
+		});
 
 		socket.on('newTurn', function(data){
 
 			console.log('switching turns');
-			turnCards();
 
 			if(data.myturn) {
 
@@ -431,11 +432,22 @@
 						$(this).addClass('flip');
 
 					}else{
+
 						console.log('not your turn buddy');
 					}
 			    	
 			    });
 
+				$('.card').each(function(index){
+
+					console.log('checking cards for flip');
+
+					if($(this).hasClass('flip')){
+						$(this).removeClass('flip');
+						console.log('flip removed');
+					}
+
+				});
 
 
 		    } else {
@@ -443,6 +455,19 @@
 				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
 				$('.click').off('click','**');
 				$(document).off('click', '.click');
+
+				$('.card').each(function(index){
+
+					console.log('checking cards for flip');
+
+					if($(this).hasClass('flip')){
+						$(this).removeClass('flip');
+						console.log('flip removed');
+					}
+
+				});
+
+				
 		    }
 
 		});

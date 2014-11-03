@@ -211,6 +211,19 @@ Speler voert naam in en klikt op Ready
                         // correct
                         console.log('CORRECTERINO!');
 
+                        table.players[i].correct++;
+
+                        console.log('cards correct, not emitting next turn');
+
+                        table.players[i].flipCounter = 0;
+                        table.players[i].flippedColor = [];
+
+                        table.pairCorrect++;
+
+                        console.log(room);
+
+                        io.sockets.emit('flipCardsBack');
+
                     }else{
                         // incorrect
 

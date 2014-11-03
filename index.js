@@ -223,6 +223,7 @@ Speler voert naam in en klikt op Ready
                         console.log(room);
 
                         io.sockets.emit('flipCardsBack');
+                        io.sockets.emit('logging', {message: table.players[i].name + ' paired cards!'});
 
                     }else{
                         // incorrect
@@ -238,12 +239,16 @@ Speler voert naam in en klikt op Ready
                                 table.players[i].flipCounter = 0;
                                 table.players[i].flippedColor = [];
 
+                                (function(e){
+                                    setTimeout(function(){
+                                        io.sockets.emit('flipCardsBack');
+                                        io.to(table.players[e].id).emit('newTurn', {
+                                            myturn: false
+                                        });
+                                    },3000);
+                                })(i);
+
                                 
-                                io.to(table.players[i].id).emit('newTurn', {
-                                    myturn: false
-                                });
-
-
                             } else {
 
                                 console.log('its my turn ' + table.players[k].id);
@@ -251,21 +256,25 @@ Speler voert naam in en klikt op Ready
                                 table.players[k].turnFinished = false;
                                 table.players[k].flipCounter = 0;
 
+                                (function(b){
+                                    setTimeout(function(){
+                                        io.sockets.emit('flipCardsBack');
+                                        io.to(table.players[b].id).emit('newTurn', {
+                                            myturn: true
+                                        });
+                                    },3000);
+                                })(k);
+
                                 
-                                io.to(table.players[k].id).emit('newTurn', {
-                                    myturn: true
-                                });
 
 
                             }
 
                         }
 
-                        
-
                     }
 
-                    io.sockets.emit('flipCardsBack');
+                    //io.sockets.emit('flipCardsBack');
 
                 }
 

@@ -254,11 +254,11 @@
 </head>
 <body>
 
-	<div id="menu">
+	<!--div id="menu">
 		<ul>
 			<li><a href="#" class="start" title="" data-toggle="tooltip" title="Start new game"><i class="fa fa-caret-right fa-lg"></i></a></li>
 		</ul>
-	</div>
+	</div-->
 	<div id="content">
 		<h1>Memory Multiplayer</h1>
 		<div id="splash">
@@ -438,16 +438,6 @@
 			    	
 			    });
 
-				$('.card').each(function(index){
-
-					console.log('checking cards for flip');
-
-					if($(this).hasClass('flip')){
-						$(this).removeClass('flip');
-						console.log('flip removed');
-					}
-
-				});
 
 
 		    } else {
@@ -455,17 +445,6 @@
 				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
 				$('.click').off('click','**');
 				$(document).off('click', '.click');
-
-				$('.card').each(function(index){
-
-					console.log('checking cards for flip');
-
-					if($(this).hasClass('flip')){
-						$(this).removeClass('flip');
-						console.log('flip removed');
-					}
-
-				});
 
 				
 		    }

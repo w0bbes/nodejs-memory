@@ -35,6 +35,20 @@ Room.prototype.getPlayer = function(playerId){
 
 }
 
+Room.prototype.otherPlayerID = function(playerId){
+
+	var notPlayer = null;
+
+	for(var i = 0; i < this.players.length; i++) {
+
+		if(this.players[i].id !== playerId) {
+
+			notPlayer = this.players[i];
+			break;
+		}
+	}
+	return notPlayer;
+}
 
 // return is een object, object Tables
 // hier zit een fout in, length op de tables object?

@@ -400,8 +400,16 @@
 				console.log('checking cards for flip');
 
 				if($(this).hasClass('flip')){
-					$(this).removeClass('flip');
+
+					if( !data.flipped.contains( $(this).data('color') ) ){
+
+						$(this).removeClass('flip');
+
+					}
+
+
 					console.log('flip removed');
+
 				}
 
 			});
@@ -414,9 +422,6 @@
 			console.log('switching turns');
 
 			if(data.myturn) {
-
-				$('#progressUpdate').html('<span class="label label-warning">It\'s your turn.</span>');
-				
 
 				$(document).on('click', '.click', function(){
 
@@ -438,18 +443,28 @@
 			    	
 			    });
 
-
-
 		    } else {
 
-				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
 				$('.click').off('click','**');
 				$(document).off('click', '.click');
 
-				
 		    }
 
 		});
+
+		socket.on('progressUpdate', function(data){
+
+			if(data.myturn) {
+
+				$('#progressUpdate').html('<span class="label label-warning">It\'s your turn.</span>');
+
+			}else{
+
+				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
+
+			}
+
+		});	
 
 		socket.on('flip', function(data){
 
@@ -462,7 +477,15 @@
 			});
 		});
 
-		
+		Array.prototype.contains = function(obj) {
+		    var i = this.length;
+		    while (i--) {
+		        if (this[i] === obj) {
+		            return true;
+		        }
+		    }
+		    return false;
+		}
 
 		$(document).ready(function(){
 

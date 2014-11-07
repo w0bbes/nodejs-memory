@@ -15,6 +15,7 @@ function Table(tableID){
 	this.gameObj = null;
 	this.name = ""; 
 	this.pairCorrect = 0;
+	this.pairsCorrect = [];
 }
 
 Table.prototype.setName = function(name){

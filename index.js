@@ -207,6 +207,8 @@ Speler voert naam in en klikt op Ready
 
         if(player.flipCounter === 2){
 
+            
+
             if(player.flippedColor.AllValuesSame()){
                 // goed
                 table.pairCorrect++;
@@ -215,6 +217,8 @@ Speler voert naam in en klikt op Ready
                     // we have a winner
 
                 }
+
+                table.pairsCorrect.push(player.flippedColor);
 
                 io.sockets.emit('logging', {message: player.name + ' paired cards!'});
 
@@ -237,134 +241,31 @@ Speler voert naam in en klikt op Ready
                 io.to(otherPlayer.id).emit('newTurn', {
                     myturn: true
                 });
+                
+                io.sockets.emit('logging', {message: 'Wrong, flipping cards back after 3 sec.'});
 
+                setTimeout(function(){
+
+                    io.sockets.emit('flipCardsBack', {flipped: table.pairsCorrect});
+                    console.log('flipped');
+
+                    io.to(player.id).emit('progressUpdate', {
+                        myturn: false
+                    });
+
+                    io.to(otherPlayer.id).emit('progressUpdate',{
+                        myturn: true
+                    });
+
+                },3000);
                 // kaarten terug
                 
 
             }
 
-            io.sockets.emit('logging', {message: 'Flipping cards back after 3 sec.'});
-
-            setTimeout(function(){
-
-                io.sockets.emit('flipCardsBack');
-                console.log('flipped');
-
-            },3000);
+            console.log(room);
 
         }
-
-        
-
-        // Dit moet allemaal opnieuw
-
-        /*
-
-            De bugs !! Ontstaan omdat je twee keer de players langs gaat!!!1
-
-        */
-
-        /*
-
-        for (var i = 0; i < table.players.length; i++) {
-
-            if(table.players[i].id === socket.id && !table.players[i].turnFinished){
-
-                table.players[i].flippedColor.push(data.color);
-                table.players[i].flipCounter++;
-
-                if (table.players[i].flipCounter === 2) {
-
-                    if (table.players[i].flippedColor.AllValuesSame()) {
-                        // correct
-                        console.log('CORRECTERINO!');
-
-                        table.players[i].correct++;
-
-                        console.log('cards correct, not emitting next turn');
-
-                        table.players[i].flipCounter = 0;
-                        table.players[i].flippedColor = [];
-
-                        table.pairCorrect++;
-
-                        console.log(room);
-
-                        io.sockets.emit('flipCardsBack');
-                        io.sockets.emit('logging', {message: table.players[i].name + ' paired cards!'});
-
-                    }else{
-                        // incorrect
-
-                        for (var k = 0; k < table.players.length; k++) {
-
-                            if (table.players[k].id === table.players[i].id) {
-
-                                // huidige speler
-                                console.log('not my turn anymore ' + table.players[i].id);
-
-                                table.players[i].turnFinished = true;
-                                table.players[i].flipCounter = 0;
-                                table.players[i].flippedColor = [];
-
-                                (function(e){
-                                    setTimeout(function(){
-                                        io.sockets.emit('flipCardsBack');
-                                        io.to(table.players[e].id).emit('newTurn', {
-                                            myturn: false
-                                        });
-                                    },3000);
-                                })(i);
-
-                                
-                            } else {
-
-                                console.log('its my turn ' + table.players[k].id);
-
-                                table.players[k].turnFinished = false;
-                                table.players[k].flipCounter = 0;
-
-                                (function(b){
-                                    setTimeout(function(){
-                                        io.sockets.emit('flipCardsBack');
-                                        io.to(table.players[b].id).emit('newTurn', {
-                                            myturn: true
-                                        });
-                                    },3000);
-                                })(k);
-
-                                
-
-
-                            }
-
-                        }
-
-                    }
-
-                    //io.sockets.emit('flipCardsBack');
-
-                }
-
-            }else{
-
-                if(table.players[i].turnFinished === true){
-
-                    console.log('event flip send on card ' + cardPos + ' to ' + table.players[i].id);
-
-                    io.to(table.players[i].id).emit('flip', {
-                        pos: cardPos
-                    });
-
-                }
-                
-
-            }
-
-            
-        }
-
-        */
         
 
     });

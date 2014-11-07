@@ -216,7 +216,6 @@ Speler voert naam in en klikt op Ready
 
                 }
 
-                io.sockets.emit('flipCardsBack');
                 io.sockets.emit('logging', {message: player.name + ' paired cards!'});
 
                 player.flipCounter = 0;
@@ -240,9 +239,19 @@ Speler voert naam in en klikt op Ready
                 });
 
                 // kaarten terug
-                io.sockets.emit('flipCardsBack');
+                
 
             }
+
+            io.sockets.emit('logging', {message: 'Flipping cards back after 3 sec.'});
+
+            setTimeout(function(){
+
+                io.sockets.emit('flipCardsBack');
+                console.log('flipped');
+
+            },3000);
+
         }
 
         

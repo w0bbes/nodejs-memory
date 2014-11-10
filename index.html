@@ -301,6 +301,17 @@
 
 		var socket = io();
 
+		Object.keys = function (obj) {
+	        var arr = [],
+	            key;
+	        for (key in obj) {
+	            if (obj.hasOwnProperty(key)) {
+	                arr.push(key);
+	            }
+	        }
+	        return arr;
+	    };
+
 		$('form').submit(function(e){
 
 			socket.emit('chat message', $('#message').val());
@@ -391,33 +402,54 @@
 
 		socket.on('flipCardsBack', function(data){
 
-			console.log('flipping cards');
 
 			var cards = $('.card');
 
+			var aantalCorrect = data.flipped.length;
+
 			$('.card').each(function(index){
 
-				console.log('checking cards for flip');
 
-				if($(this).hasClass('flip')){
+				for(var c = 1; c < aantalCorrect; c++){
 
-					if( !data.flipped.contains( $(this).data('color') ) ){
+					if($(this).data('color') !== data.flipped[c]){
 
 						$(this).removeClass('flip');
 
 					}
-
-					console.log('flip removed');
-
 				}
 
 			});
 
 		});
 
-		socket.on('turnDone', function(){
+		socket.on('clicksOff', function(){
 			$('.click').off('click','**');
 			$(document).off('click', '.click');
+		});
+
+		socket.on('clicksOn', function(data){
+
+			$(document).on('click', '.click', function(){
+
+				if(!$(this).hasClass('flip')){
+					
+					// emit turn event.
+					var pos = $(this).data('position');
+					var color = $(this).data('color');
+					socket.emit('flipCard', {pos: pos, tableID: 1, color: color});
+
+					console.log('card flipped ' + pos);
+
+					$(this).addClass('flip');
+
+				}else{
+
+					console.log('not your turn buddy');
+				}
+		    	
+		    });
+
 		});
 
 		socket.on('newTurn', function(data){
@@ -480,6 +512,7 @@
 			});
 		});
 
+		/*
 		Array.prototype.contains = function(obj) {
 		    var i = this.length;
 		    while (i--) {
@@ -489,6 +522,10 @@
 		    }
 		    return false;
 		}
+		*/
+
+		
+
 
 		$(document).ready(function(){
 

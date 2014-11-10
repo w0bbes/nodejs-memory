@@ -208,7 +208,7 @@ Speler voert naam in en klikt op Ready
         if(player.flipCounter === 2){
 
             // alle flip event eruit halen
-            io.sockets.emit('turnDone');
+            io.sockets.emit('clicksOff');
 
             if(player.flippedColor.AllValuesSame()){
                 // goed
@@ -221,10 +221,23 @@ Speler voert naam in en klikt op Ready
 
                 table.pairsCorrect.push(player.flippedColor);
 
+                for(var b = 0; b < player.flippedColor.length; b++){
+                    table.pairsCorrect.push(player.flippedColor[b]);
+                }
+
                 io.sockets.emit('logging', {message: player.name + ' paired cards!'});
 
-                player.flipCounter = 0;
-                player.flippedColor = [];
+                setTimeout(function(){
+
+                    player.flipCounter = 0;
+                    player.flippedColor = [];
+
+                    // TODO turnStart, clicks activeren
+
+                    io.sockets.emit('flipCardsBack', {flipped: table.pairsCorrect});
+                    io.to(player.id).emit('clicksOn');
+                    
+                },3000);
 
             }else{
                 // fout

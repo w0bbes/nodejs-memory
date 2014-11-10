@@ -207,7 +207,8 @@ Speler voert naam in en klikt op Ready
 
         if(player.flipCounter === 2){
 
-            
+            // alle flip event eruit halen
+            io.sockets.emit('turnDone');
 
             if(player.flippedColor.AllValuesSame()){
                 // goed
@@ -228,23 +229,23 @@ Speler voert naam in en klikt op Ready
             }else{
                 // fout
                 // Huidige speler van beurt wissen
-                player.turnFinished = true;
-                player.flipCounter = 0;
-                player.flippedColor = [];
-
-                io.to(player.id).emit('newTurn', {
-                    myturn: false
-                });
-
-                // beurt naar de andere speler
-                otherPlayer.turnFinished = true;
-                io.to(otherPlayer.id).emit('newTurn', {
-                    myturn: true
-                });
-                
                 io.sockets.emit('logging', {message: 'Wrong, flipping cards back after 3 sec.'});
 
                 setTimeout(function(){
+
+                    player.turnFinished = true;
+                    player.flipCounter = 0;
+                    player.flippedColor = [];
+
+                    io.to(player.id).emit('newTurn', {
+                        myturn: false
+                    });
+
+                    // beurt naar de andere speler
+                    otherPlayer.turnFinished = true;
+                    io.to(otherPlayer.id).emit('newTurn', {
+                        myturn: true
+                    });
 
                     io.sockets.emit('flipCardsBack', {flipped: table.pairsCorrect});
                     console.log('flipped');

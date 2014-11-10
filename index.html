@@ -407,14 +407,17 @@
 
 					}
 
-
 					console.log('flip removed');
 
 				}
 
 			});
 
+		});
 
+		socket.on('turnDone', function(){
+			$('.click').off('click','**');
+			$(document).off('click', '.click');
 		});
 
 		socket.on('newTurn', function(data){

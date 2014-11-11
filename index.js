@@ -216,12 +216,15 @@ Speler voert naam in en klikt op Ready
 
                 if(table.pairCorrect === 16){
                     // we have a winner
-
+                    console.log('alweer een winnaar!');
                 }
 
                 table.pairsCorrect.push(player.flippedColor);
 
+                console.log('Correct to nu toe ' + table.pairsCorrect);
+
                 for(var b = 0; b < player.flippedColor.length; b++){
+                    
                     table.pairsCorrect.push(player.flippedColor[b]);
                 }
 
@@ -235,6 +238,7 @@ Speler voert naam in en klikt op Ready
                     // TODO turnStart, clicks activeren
 
                     io.sockets.emit('flipCardsBack', {flipped: table.pairsCorrect});
+                    console.log('flipped back');
                     io.to(player.id).emit('clicksOn');
                     
                 },3000);
@@ -243,8 +247,12 @@ Speler voert naam in en klikt op Ready
                 // fout
                 // Huidige speler van beurt wissen
                 io.sockets.emit('logging', {message: 'Wrong, flipping cards back after 3 sec.'});
+                console.log('Correct to nu toe ' + table.pairsCorrect);
 
                 setTimeout(function(){
+
+                    io.sockets.emit('flipCardsBack', {flipped: table.pairsCorrect});
+                    console.log('flipped');
 
                     player.turnFinished = true;
                     player.flipCounter = 0;
@@ -260,9 +268,9 @@ Speler voert naam in en klikt op Ready
                         myturn: true
                     });
 
-                    io.sockets.emit('flipCardsBack', {flipped: table.pairsCorrect});
-                    console.log('flipped');
+                    
 
+                    // updates ergens in het midden?! Feest?
                     io.to(player.id).emit('progressUpdate', {
                         myturn: false
                     });

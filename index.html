@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
@@ -406,20 +406,28 @@
 			var cards = $('.card');
 
 			var aantalCorrect = data.flipped.length;
+			var newCorrect = [];
 
-			$('.card').each(function(index){
+			for(var i = 0; i < aantalCorrect; i++){
+				newCorrect.push(data.flipped[i]);
+			}
+			console.log('length data flipped' + aantalCorrect);
+			console.log('object data.flipped' + data.flipped);
 
+			if(aantalCorrect > 0){
 
-				for(var c = 1; c < aantalCorrect; c++){
+				$('.card').each(function(index){
 
-					if($(this).data('color') !== data.flipped[c]){
-
+					if( $.inArray( $(this).data('color'), newCorrect ) === -1 )
 						$(this).removeClass('flip');
+					
+				});
 
-					}
-				}
+			}else{
 
-			});
+				cards.removeClass('flip');
+
+			}
 
 		});
 

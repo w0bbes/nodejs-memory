@@ -219,8 +219,6 @@ Speler voert naam in en klikt op Ready
                     console.log('alweer een winnaar!');
                 }
 
-                table.pairsCorrect.push(player.flippedColor);
-
                 console.log('Correct to nu toe ' + table.pairsCorrect);
 
                 for(var b = 0; b < player.flippedColor.length; b++){

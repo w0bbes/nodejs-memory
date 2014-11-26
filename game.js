@@ -7,14 +7,14 @@ Game.prototype.makeDeck = function(){
 	var aantal = 16;
 	var colors = ['AliceBlue','AntiqueWhite','Aqua','Aquamarine','Blue','CornflowerBlue','Cyan','DarkBlue','DarkOrange','DarkViolet','FireBrick','ForestGreen','Gold','Green','GreenYellow','HotPink'];
 
-	var deck = colors;
-	//var deck = this.shuffleColors(colors);
+	//var deck = colors;
+	var deck = this.shuffleColors(colors);
 
 	var deck1 = deck;
 	var deck2 = deck;
 
-	//finalDeck = this.shuffleColors( deck1.concat(deck2) );
-	finalDeck = deck1.concat(deck2);
+	finalDeck = this.shuffleColors( deck1.concat(deck2) );
+	//finalDeck = deck1.concat(deck2);
 
 	return finalDeck;
 

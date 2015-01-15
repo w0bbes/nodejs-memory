@@ -123,7 +123,6 @@ Speler voert naam in en klikt op Ready
 
         var player = room.getPlayer(socket.id);
 
-
         var table = room.getTable(data.table);
         player.status = 'playing';
 
@@ -150,10 +149,8 @@ Speler voert naam in en klikt op Ready
                     io.sockets.emit('logging', {
                         message: table.players[i].name + ' will start.'
                     });
-
-                    io.to(table.players[i].id).emit('turn', {
-                        myturn: true
-                    });
+                    // deck mee sturen.
+                    io.to(table.players[i].id).emit('turn', {myturn: true, deck: table.pack});
 
                 } else {
 
@@ -163,9 +160,8 @@ Speler voert naam in en klikt op Ready
 
                     table.players[i].turnFinished = true;
 
-                    io.to(table.players[i].id).emit('turn', {
-                        myturn: false
-                    });
+                    // deck mee sturen.
+                    io.to(table.players[i].id).emit('turn', {myturn: false, deck: table.pack});
 
                 }
 
@@ -190,19 +186,35 @@ Speler voert naam in en klikt op Ready
         
         var player = room.getPlayer(socket.id);
 
-
         var table = room.getTable(data.tableID);
         var cardPos = data.pos;
-        var flippedColor = data.color;
 
+        var keys = Object.keys(table.pack);
+        
+        //console.log('de flippedColor color: ' + flippedColor);
 
-        player.flippedColor.push(data.color);
+        //var flippedColor = deckPack[cardPos];
+
+        for(var i = 0; i < keys.length; i++){
+
+            var keysVal = table.pack[keys[i]];
+
+            if(keysVal === table.pack[keys[cardPos]]){
+                console.log('hit');
+                var flippedColor = keysVal;
+            }
+        }
+
+        console.log('de flippedcolor server side: ' + flippedColor);
+
+        player.flippedColor.push(flippedColor);
         player.flipCounter++;
 
         var otherPlayer = room.otherPlayerID(socket.id);
 
-        io.to(otherPlayer.id).emit('flip', {
-            pos: cardPos
+        io.sockets.emit('flip', {
+            pos: cardPos,
+            color: flippedColor
         });
 
         if(player.flipCounter === 2){
@@ -288,6 +300,12 @@ Speler voert naam in en klikt op Ready
         }
         
 
+    });
+
+    socket.on('getCard', function(data){
+        var table = room.getTable(data.table);
+        var pack = table.pack;
+        console.log('got position');
     });
 
     socket.on('disconnect', function() {

@@ -356,7 +356,9 @@
 
 					$(this).delay(100*index).fadeIn(100);
 
-					$('#game').append('<div class="card click" data-color="'+color+'" data-index="'+index+'" data-position="'+index+'"><div class="card--front"><div class="blue--top"></div></div><div class="card--back"><div class="back--inner" style="background:' + color + '"></div></div></div>');
+					$('#game').append('<div class="card click" data-color="'+color+'" data-index="'+index+'" data-position="'+index+'"><div class="card--front"><div class="blue--top"></div></div><div class="card--back"><div class="back--inner"></div></div></div>');
+
+					//$('#game').append('<div class="card click" data-color="'+color+'" data-index="'+index+'" data-position="'+index+'"><div class="card--front"><div class="blue--top"></div></div><div class="card--back"><div class="back--inner" style="background:' + color + '"></div></div></div>');
 				});
 
 			});
@@ -379,13 +381,14 @@
 					if(!$(this).hasClass('flip')){		    		
 						
 						// emit turn event.
+
+						// stuur positie naar server, server stuur de kleur terug en draait dan de kleur om.
 						var pos = $(this).data('position');
-						var color = $(this).data('color');
-						socket.emit('flipCard', {pos: pos, tableID: 1, color: color});
+						socket.emit('flipCard', {pos: pos, tableID: 1});
 
 						console.log('card flipped ' + pos);
 
-						$(this).addClass('flip');
+						
 
 					}else{
 						console.log('not your turn buddy');
@@ -398,6 +401,24 @@
 				$('#progressUpdate').html('<span class="label label-warning">It\'s your opponent\'s turn.</span>');
 				$('.click').unbind('click');
 		    }
+		});
+
+		socket.on('flipSingle', function(data){
+
+			var cards = $('.card');
+
+			for(i = 0; i < cards.length; i++){
+
+				if($('.card').data('position') === data.pos){
+					// todo:
+					// - add the color
+					// - flip color
+					$(this).addClass('flip');
+				}
+
+			}
+
+			
 		});
 
 		socket.on('flipCardsBack', function(data){
@@ -514,6 +535,8 @@
 
 			$('.card').each(function(index){
 				if(index === data.pos){
+					$(this).find($('.back--inner')).css({'background':data.color});
+					console.log(data.color + ' flipped');
 					$(this).addClass('flip');
 				}
 			});
